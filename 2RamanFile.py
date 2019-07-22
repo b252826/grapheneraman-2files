@@ -31,8 +31,8 @@ from matplotlib import pyplot
 # OR 2: Parse each txt file in folder, run slice/plot code on each file as it is found.
 # This code uses method one. I'd like to change it to method 2 if possible.
 
-os.chdir('/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C2')
-myPath = '/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C2'
+os.chdir('/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C3')
+myPath = '/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C3'
 FileNames = glob.glob1(myPath, '*.txt') #list(?)
 
 numberofplots = len(FileNames)
@@ -44,6 +44,8 @@ ratio = {}
 a = {}
 b = {}
 avgRatio = 0
+lengthR = 0
+sumR = 0
 wavenumber = {}
 NewFile = []
 intensity = {}
@@ -164,12 +166,12 @@ for i in range(len(fileNamesTwoD)):
 
 
 
-#f = open('Test/output.txt', 'w')
-#for i in range(len(listG)):
+# f = open('Test/output.txt', 'w')
+# for i in range(len(listG)):
 #    print('this is list', list2D)
-#for i in range(len(listG)):
+# for i in range(len(listG)):
 #    f.write("%s ", list)
-#f.close()
+# f.close()
 
 #with open('Test/output.txt', 'w') as f:
 #    for item,name in listG:
@@ -179,7 +181,15 @@ for i in range(len(fileNamesTwoD)):
 #print('\tthis is g = ', a[5])
 #print('this is b = ', b)
 #print('this is ratio = ', b / a)
-avgRatio = np.average(ratio)
-print('this is ratio = ', ratio)
-print('file name',fileNamesTwoD)
+
+# print('this is ratio = ', ratio)
+# print('file name',fileNamesTwoD)
+
+
+for w in range(len(ratio)):
+     sumR = sumR + ratio[w]
+     if w > len(ratio):
+         break
+avgRatio = sumR/len(ratio)
+
 print('this is average', avgRatio)
