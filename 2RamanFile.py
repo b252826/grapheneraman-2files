@@ -4,7 +4,6 @@
 # The other cells further below are used for files from "extended scans" with both peaks in 1 file.
 
 ###This is the code for sorted files (C1 folder, C2 folder...)
-
 import numpy as np
 #import simplejson
 import pandas as pd
@@ -31,22 +30,39 @@ from matplotlib import pyplot
 # OR 2: Parse each txt file in folder, run slice/plot code on each file as it is found.
 # This code uses method one. I'd like to change it to method 2 if possible.
 
-os.chdir('/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C2')
+###Change myPath
 myPath = '/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C2'
+SamplePath = '/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C2'
+CombinedPath = '/Users/DerekChang/Documents/Ragan Lab/Test/063019-BijelBoxC2-C3 copy 2/C2/Combined'
+os.chdir(myPath)
+
 FileNames = glob.glob1(myPath, '*.txt') #list(?)
+DataNames = glob.glob1(CombinedPath, '*.txt')
 
 numberofplots = len(FileNames)
 
+
+###Declared variables
 list = {}
 list2D = {}
 listG = {}
 ratio = {}
 a = {}
 b = {}
+VisN = 0
+Number = 0
+Name2D = {}
+NameG = 0
 avgRatio = 0
+lengthR = 0
+sumR = 0
 wavenumber = {}
+wavenumber1 = {}
+
 NewFile = []
 intensity = {}
+intensity1 = {}
+
 filenames = {}
 fileNamesTwoD = {}
 fileNamesG = {}
@@ -55,6 +71,7 @@ twoDPeakArray = {}
 # initialize G and 2D counter iterator for for loops
 gCounter = 0
 twoDCounter = 0
+
 
 fig, axs = plt.subplots(numberofplots, 1, figsize=(10, 60), constrained_layout=False)
 fig.tight_layout()
@@ -136,40 +153,66 @@ for counter, datafile in enumerate(FileNames):  # enumerate splits a list up int
     # intensity_ratio_2dg = twoDPeakArray[twoDCounter]/gPeakArray[gCounter]
     #   print("gpeak is %f"% gpeak)a
 
-    #   intensity_ratio_2dg
-###    axs[counter].plot(wavenumber[counter], y3)
-####   axs[counter].set_title('I_2D / I_G Ratio = %f \n' % intensity_ratio_2dg)
-#    axs[counter].set_xlabel(r'$Wavenumber\ (cm^{-1})$')
-#    axs[counter].set_ylabel('$Intensity\ (a.u.)$')
-#    fig.suptitle('Graphene on quartz', fontsize=16)
-#    if len(FileNames) - 1 == counter:
-#        plt.show()
-###       plt.savefig('Graphene-on-quartz.png') ##graphs
+    # Graphing
+    # axs[counter].plot(wavenumber[counter], y3)
+    # axs[counter].set_xlabel(r'$Wavenumber\ (cm^{-1})$')
+    # axs[counter].set_ylabel('$Intensity\ (a.u.)$')
+    # if len(FileNames) - 1 == counter:
+    #     plt.show()
+    #     plt.savefig('Graphene-on-quartz.png')
 
+### Matching
 for i in range(len(fileNamesTwoD)):
     for j in range(len(fileNamesG)):
-        # print('j =', j)
-        # print('g = ', a[j])
-        # print('i = ', i)
-        # print('2d =', b[i])
-
-        if np.array_equal(fileNamesTwoD[i] ,fileNamesG[j]):   ## think about when there's more 2D or g File
+        if np.array_equal(fileNamesTwoD[i] ,fileNamesG[j]):
             ratio[i] = np.array(b[i] / a[j])
-            if fileNamesTwoD[i] != fileNamesG[j]:
-                j = j + 1
-            if fileNamesTwoD[i] == len(fileNamesG)-1:
-                break
+            def createFolder(directory):         ##creates folder if there isn't one exist already
+                try:
+                    if not os.path.exists(directory):
+                        os.makedirs(directory)
+                except OSError:
+                    print('Error: Creating directory. ' + directory)
+            createFolder('./Combined/')          ##folder name
+## try to append the text files here listG[j] with list2D[i]
+            os.chdir(CombinedPath)
+            with open("2DG_Ratio_Combined.txt", "wb") as CR:
+            # np.savetxt(listG[j].append(list2D[i]))
+                np.savetxt(CR, list2D[i], delimiter='\t')
+                np.savetxt(CR, listG[i], delimiter='\t')
+            # print(listG[j])
+            # np.savetxt('2DG_Ratio_Combined.txt',listG[j], delimiter = '\t')
+                VisN = len(fileNamesTwoD)-1
+            # print('this is VisN', VisN)
+                NameG = fileNamesTwoD[j]
+                os.rename('2DG_Ratio_Combined.txt', '%s' %NameG)
+                os.chdir(SamplePath)
+                if fileNamesTwoD[i] != fileNamesG[j]:
+                    j = j + 1
+                if fileNamesTwoD[i] == len(fileNamesG)-1:
+                    break
 
+###Graphing
+for counter2, dataNames in enumerate(DataNames):
+    os.chdir(CombinedPath)
+    CombinedPath = CombinedPath + '/' + dataNames
+    dataNames = np.loadtxt(CombinedPath,delimiter='\t')  
+    wavenumber1[counter2] = dataNames[:, 0]
+    intensity1[counter2] = dataNames[:, 1]
+    print('this is date name',dataNames)
+    axs[counter2].plot(wavenumber1[counter2], intensity1[counter2])
+    axs[counter2].set_xlabel(r'$Wavenumber\ (cm^{-1})$')
+    axs[counter2].set_ylabel('$Intensity\ (a.u.)$')
+    if len(DataNames) - 1 == counter2:
+        plt.show()
+        os.chdir(SamplePath)
+        plt.savefig('Graphene-on-quartz.png')
 
-
-
-
-#f = open('Test/output.txt', 'w')
-#for i in range(len(listG)):
+# f = open('Test/output.txt', 'w')
+# for i in range(len(listG)):
 #    print('this is list', list2D)
-#for i in range(len(listG)):
+# for i in range(len(listG)):
 #    f.write("%s ", list)
-#f.close()
+# f.close()
 
 #with open('Test/output.txt', 'w') as f:
 #    for item,name in listG:
@@ -179,7 +222,16 @@ for i in range(len(fileNamesTwoD)):
 #print('\tthis is g = ', a[5])
 #print('this is b = ', b)
 #print('this is ratio = ', b / a)
-avgRatio = np.average(ratio)
-print('this is ratio = ', ratio)
-print('file name',fileNamesTwoD)
+
+# print('this is listg = ', listG)
+# print('file name',fileNamesTwoD)
+
+
+for w in range(len(ratio)):    ##this calculates the average ratio
+     sumR = sumR + ratio[w]
+     if w > len(ratio):
+         break
+avgRatio = sumR/len(ratio)
+
 print('this is average', avgRatio)
+# print('this is names ', NameG)
